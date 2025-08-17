@@ -230,7 +230,7 @@
 
         /* Navigation Buttons */
         .nav-btn {
-            position: absolute;
+            position: fixed; /* Changed to fixed for viewport-relative positioning */
             top: 50%;
             transform: translateY(-50%);
             background: rgba(255, 255, 255, 0.2);
@@ -250,14 +250,10 @@
             z-index: 10;
         }
         #prevBtn {
-            left: -70px; /* Positioned outside the main container */
+            left: 2vw; /* Positioned relative to the viewport width */
         }
         #nextBtn {
-            right: -70px; /* Positioned outside the main container */
-        }
-        @media (max-width: 1200px) {
-             #prevBtn { left: 1rem; }
-             #nextBtn { right: 1rem; }
+            right: 2vw; /* Positioned relative to the viewport width */
         }
         .nav-btn:hover {
             background: rgba(50, 224, 196, 0.3);
