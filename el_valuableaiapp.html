@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lovable.dev Session: Building Progressive AI Apps</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+        /* CSS Variables for consistent styling */
+        :root {
+            /* Dark Background */
+            --color-bg-start: #0F2027;
+            --color-bg-mid: #203A43;
+            --color-bg-end: #2C5364;
+
+            /* New Teal & Aqua Accent Theme from Logo */
+            --color-primary-teal: #0d7377;
+            --color-secondary-aqua: #32e0c4;
+            --color-accent-gold: #DAA520;
+
+            /* Nebula Colors updated for the new theme */
+            --color-nebula1-start: rgba(13, 115, 119, 0.4);
+            --color-nebula1-mid: rgba(50, 224, 196, 0.45);
+            --color-nebula1-end: rgba(224, 242, 241, 0.3);
+            --color-nebula2-start: rgba(50, 224, 196, 0.45);
+            --color-nebula2-mid: rgba(70, 130, 180, 0.35);
+            --color-nebula2-end: rgba(13, 115, 119, 0.4);
+
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --text-color: #fff;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Basic Reset and Font */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-color);
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, var(--color-bg-start), var(--color-bg-mid), var(--color-bg-end));
+            position: relative;
+        }
+
+        /* Animated Nebula Background */
+        .nebula {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.7;
+            will-change: transform;
+        }
+        #nebula1 {
+            width: 55vmax;
+            height: 55vmax;
+            top: -20%;
+            right: -20%;
+            background: linear-gradient(to bottom right, var(--color-nebula1-start), var(--color-nebula1-mid), var(--color-nebula1-end));
+            animation: move-nebula1 120s linear infinite;
+        }
+        #nebula2 {
+            width: 50vmax;
+            height: 50vmax;
+            bottom: -25%;
+            left: -20%;
+            background: linear-gradient(to top right, var(--color-nebula2-start), var(--color-nebula2-mid), var(--color-nebula2-end));
+            animation: move-nebula2 150s linear infinite;
+        }
+        @keyframes move-nebula1 {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(-20vw, 20vh); }
+            100% { transform: translate(0, 0); }
+        }
+        @keyframes move-nebula2 {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(25vw, -25vh); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* Starfield Animation */
+        #starfield {
+            position: absolute;
+            inset: 0;
+        }
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            animation: star-flow linear infinite;
+            will-change: transform, opacity;
+        }
+        @keyframes star-flow {
+            0% { transform: translateY(100vh); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(0vh); opacity: 0; }
+        }
+
+        /* Slide Container and Glassmorphism */
+        .slide-container {
+            position: relative;
+            width: 90%;
+            max-width: 1000px;
+            height: 85vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        /* Header for Logo */
+        .app-header {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            z-index: 20;
+            display: none; /* Hidden by default */
+        }
+        .app-header.visible {
+            display: block;
+        }
+        .app-header img {
+            height: 50px;
+            width: auto;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 1.5rem;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hero-logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .slide h1 {
+            font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            color: var(--color-secondary-aqua);
+        }
+
+        .slide p {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            max-width: 800px;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .slide-content-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            width: 100%;
+        }
+        @media (min-width: 768px) {
+            .slide-content-grid {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+        }
+        .slide-text, .slide-infographic, .architecture-diagram {
+            flex: 1;
+        }
+        .slide-text {
+            text-align: left;
+        }
+        .slide-text h2 {
+            font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+        .slide-text p {
+            font-size: clamp(0.85rem, 1.5vw, 1rem);
+            margin-bottom: 0;
+        }
+
+        .slide-infographic, .architecture-diagram {
+            width: 100%;
+            max-width: 450px;
+        }
+        .slide-infographic img, .architecture-diagram img {
+            width: 100%;
+            height: auto;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+        }
+        .architecture-diagram a {
+            color: var(--color-secondary-aqua);
+            text-decoration: none;
+        }
+
+        /* Navigation Buttons */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            font-size: 1.5rem;
+            font-weight: 700;
+            z-index: 10;
+        }
+        #prevBtn {
+            left: -70px; /* Positioned outside the main container */
+        }
+        #nextBtn {
+            right: -70px; /* Positioned outside the main container */
+        }
+        @media (max-width: 1200px) {
+             #prevBtn { left: 1rem; }
+             #nextBtn { right: 1rem; }
+        }
+        .nav-btn:hover {
+            background: rgba(50, 224, 196, 0.3);
+            transform: translateY(-50%) scale(1.05);
+        }
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(-50%) scale(1);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .whole-panel-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50px;
+            padding: 0.7rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            font-weight: 600;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .whole-panel-btn:hover {
+            background: rgba(50, 224, 196, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Prompt Modal */
+        .prompt-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+        .prompt-modal-overlay.visible {
+            display: flex;
+            opacity: 1;
+        }
+        .prompt-modal-content {
+            max-width: 700px;
+            width: 100%;
+            position: relative;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+        }
+        .prompt-modal-content h3 {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            margin-bottom: 1rem;
+            color: var(--color-secondary-aqua);
+        }
+        .prompt-modal-content textarea {
+            width: 100%;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            color: white;
+            font-family: 'monospace', monospace;
+            font-size: 0.9rem;
+            resize: none;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        .prompt-modal-content .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        .prompt-modal-content .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated nebula background -->
+    <div id="nebula1" class="nebula"></div>
+    <div id="nebula2" class="nebula"></div>
+    <div id="starfield"></div>
+
+    <!-- Main slide container with glassmorphism -->
+    <div class="slide-container">
+        
+        <div class="app-header">
+            <img src="https://experimentlabs.in/assets/Experimentlabs_logo-D8clN1f6.svg" alt="Experiment Labs Logo">
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <img src="https://experimentlabs.in/assets/Experimentlabs_logo-D8clN1f6.svg" alt="Experiment Labs Logo" class="hero-logo">
+            <h1>Building a "Value-First" AI Product</h1>
+            <p>Using Lovable.dev, we'll build an intelligent app that provides value *before* asking users to sign up, creating a truly delightful experience.</p>
+        </div>
+
+        <!-- Slide 2: The Old Way is Broken -->
+        <div class="slide">
+            <h1>The Old Way: High Friction, Low Value</h1>
+            <p>Most apps force users through tedious sign-up forms before they see any value. This leads to high drop-off rates and frustrated users.</p>
+             <div class="slide-infographic">
+                <img src="https://placehold.co/600x300/1e293b/d1d5db?text=User+→+Sign-Up+Wall+→+Generic+App+→+User+Leaves" alt="Diagram showing a user leaving an app due to a sign-up wall">
+            </div>
+        </div>
+        
+        <!-- Slide 3: The "Value-First" Funnel -->
+        <div class="slide">
+            <h1>Our Solution: The "Value-First" Funnel</h1>
+            <p>We'll flip the model: **Engage** with an interactive tool, **Personalize** the experience with AI, and then **Convert** the user by offering to save their results.</p>
+             <div class="slide-infographic">
+                <img src="https://placehold.co/600x300/1e293b/d1d5db?text=User+→+Interactive+Tool+→+AI+Results+→+Sign-Up" alt="Diagram of the value-first funnel">
+            </div>
+        </div>
+
+        <!-- Slide 4: The Architecture -->
+        <div class="slide">
+            <h1>The App Architecture</h1>
+            <p>This is how our components work together. A user interacts with the frontend, which communicates with our backend API. The API uses an AI model and a database to deliver personalized results.</p>
+            <div class="architecture-diagram">
+                <a href="https://app.eraser.io/workspace/hr76U0WTeRtKXBXay1bi?elements=Kdz5aDUKspliieYXhvJR0A" target="_blank">
+                    View on Eraser<br />
+                    <img src="https://app.eraser.io/workspace/hr76U0WTeRtKXBXay1bi/preview?elements=Kdz5aDUKspliieYXhvJR0A&type=embed" alt="Application Architecture Diagram from Eraser.io"/>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Step 1: The Interactive Hook -->
+        <div class="slide">
+            <h1>Step 1: The Interactive Hook</h1>
+            <p>First, we build the anonymous, multi-step questionnaire. It's a conversational UI that feels engaging and captures the user's goals without needing an account.</p>
+            <button class="whole-panel-btn view-prompt-btn" data-prompt-id="prompt-step1">View Prompt</button>
+        </div>
+        
+        <!-- Slide 6: Step 2: AI Reveal & Conversion -->
+        <div class="slide">
+            <h1>Step 2: The AI Reveal & Conversion</h1>
+            <p>Next, we take the user's answers, get instant AI-powered career path recommendations, and then prompt them to create an account to save and explore their results.</p>
+            <button class="whole-panel-btn view-prompt-btn" data-prompt-id="prompt-step2">View Prompt</button>
+        </div>
+
+        <!-- Slide 7: Step 3: Building the Data Foundation -->
+        <div class="slide">
+            <h1>Step 3: The Data Foundation</h1>
+            <p>Now we set up our database. This ER diagram shows how we'll store user data, their profiles, and the vast amount of college and course information.</p>
+            <div class="architecture-diagram">
+                <img src="https://placehold.co/800x400/1e293b/d1d5db?text=ER+Diagram:+Users+|+Student_Profiles+|+Colleges" alt="ER Diagram for the database">
+            </div>
+            <button class="whole-panel-btn view-prompt-btn" data-prompt-id="prompt-step3">View Prompt</button>
+        </div>
+
+        <!-- Slide 8: Step 4: AI-Powered Data Sourcing -->
+        <div class="slide">
+            <h1>Step 4: AI Data Sourcing</h1>
+            <p>Manually populating a database is slow. We'll use a prompt to have our AI model generate and insert thousands of records for courses and universities automatically.</p>
+            <button class="whole-panel-btn view-prompt-btn" data-prompt-id="prompt-step4">View Prompt</button>
+        </div>
+
+        <!-- Slide 9: Step 5: The Progressive Feedback Loop -->
+        <div class="slide">
+            <h1>Step 5: The Progressive Feedback Loop</h1>
+            <p>Once a user is signed in, the app starts learning. Saving a course or university as a "favorite" refines their profile and leads to even smarter future recommendations.</p>
+            <button class="whole-panel-btn view-prompt-btn" data-prompt-id="prompt-step5">View Prompt</button>
+        </div>
+
+        <!-- Slide 10: Step 6: Monetization -->
+        <div class="slide">
+            <h1>Step 6: Monetization</h1>
+            <p>Finally, we add a premium plan. With a simple prompt, we can integrate Stripe to unlock advanced features, creating a clear path to revenue.</p>
+            <button class="whole-panel-btn view-prompt-btn" data-prompt-id="prompt-step6">View Prompt</button>
+        </div>
+
+        <!-- Slide 11: Conclusion -->
+        <div class="slide">
+            <h1>Conclusion: Focus on the Idea</h1>
+            <p>Lovable.dev automates the complex parts, letting you focus on creating delightful, intelligent products. The most valuable part of an application is the idea, not the code.</p>
+        </div>
+        
+    </div>
+
+    <!-- Prompt Modal Overlay -->
+    <div id="prompt-modal" class="prompt-modal-overlay">
+        <div class="prompt-modal-content">
+            <button class="modal-close-btn">&times;</button>
+            <h3 id="prompt-modal-title"></h3>
+            <textarea id="prompt-textarea" readonly></textarea>
+            <div class="modal-buttons">
+                <button class="whole-panel-btn" id="copy-prompt-btn">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation buttons for the slides -->
+    <button id="prevBtn" class="nav-btn">&lt;</button>
+    <button id="nextBtn" class="nav-btn">&gt;</button>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const promptBtns = document.querySelectorAll('.view-prompt-btn');
+        const promptModal = document.getElementById('prompt-modal');
+        const modalTitle = document.getElementById('prompt-modal-title');
+        const promptTextarea = document.getElementById('prompt-textarea');
+        const copyBtn = document.getElementById('copy-prompt-btn');
+        const modalCloseBtn = promptModal.querySelector('.modal-close-btn');
+        const appHeader = document.querySelector('.app-header');
+
+        let currentSlide = 0;
+        const starfield = document.getElementById('starfield');
+        const starCount = 150;
+
+        // Prompts data
+        const prompts = {
+            'prompt-step1': `Create a single-page web application called 'Career Compass'. The main page should be a multi-step, conversational questionnaire for anonymous users. It should ask about their favorite subjects, hobbies, and learning style using interactive elements like selectable tags and choice cards. Store the answers temporarily in the browser's local state.`,
+            'prompt-step2': `After the last question, take the user's answers and send them to the Gemini API. Ask the AI to identify three potential career paths. Display these three career titles as a 'teaser'. Below the teaser, add a sign-up/login form with the message: 'Create a free account to unlock your detailed career report, courses, and university matches!'`,
+            'prompt-step3': `Set up a database with three tables: 'users' (for authentication), 'student_profiles' (to store questionnaire answers, linked to a user ID), and 'colleges' (with columns for name, location, and description). When a user signs up, save their questionnaire answers from the local state into their 'student_profiles' record.`,
+            'prompt-step4': `Create a backend function that uses the Gemini API to find and insert 100 US colleges into the 'colleges' table. For each college, include its name, state, and a brief description of its strengths.`,
+            'prompt-step5': `Once a user is logged in, display their full AI-generated report. On the university recommendations page, add a 'Save to Favorites' button. When clicked, create a 'user_favorites' table and store the user's ID and the college ID. Add a new feature that lets users click 'Refine Recommendations', which sends their original profile AND their saved favorites to the AI for a smarter, updated list.`,
+            'prompt-step6': `Integrate Stripe to add a 'Premium' plan for $15/month. Premium users can access detailed video interviews with professionals in their matched career paths and get direct application links to recommended universities. Add a checkout button on the dashboard for non-premium users.`
+        };
+
+        function showSlide(n) {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === n) {
+                    slide.classList.add('active');
+                }
+            });
+            // Show/hide header logo
+            if (n === 0) {
+                appHeader.classList.remove('visible');
+            } else {
+                appHeader.classList.add('visible');
+            }
+            updateButtons();
+        }
+
+        function updateButtons() {
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+        }
+
+        function generateStars() {
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 0.5;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.animationDuration = `${20 + Math.random() * 20}s`;
+                star.style.animationDelay = `${Math.random() * 20}s`;
+                starfield.appendChild(star);
+            }
+        }
+
+        // Modal Logic
+        promptBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const promptId = btn.dataset.promptId;
+                const titleElement = btn.closest('.slide').querySelector('h1, h2');
+                modalTitle.textContent = titleElement ? titleElement.textContent : 'View Prompt';
+                promptTextarea.value = prompts[promptId] || '';
+                promptModal.classList.add('visible');
+            });
+        });
+
+        modalCloseBtn.addEventListener('click', () => {
+            promptModal.classList.remove('visible');
+        });
+
+        promptModal.addEventListener('click', (e) => {
+            if (e.target === promptModal) {
+                promptModal.classList.remove('visible');
+            }
+        });
+
+        copyBtn.addEventListener('click', () => {
+            promptTextarea.select();
+            document.execCommand('copy');
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy';
+            }, 2000);
+        });
+
+        // Navigation
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showSlide(currentSlide);
+            generateStars();
+        });
+    </script>
+
+</body>
+</html>
