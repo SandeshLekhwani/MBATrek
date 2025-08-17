@@ -564,7 +564,7 @@
             }, 2000);
         });
 
-        // Navigation
+        // Click Navigation
         nextBtn.addEventListener('click', () => {
             if (currentSlide < slides.length - 1) {
                 currentSlide++;
@@ -576,6 +576,15 @@
             if (currentSlide > 0) {
                 currentSlide--;
                 showSlide(currentSlide);
+            }
+        });
+        
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextBtn.click();
+            } else if (e.key === 'ArrowLeft') {
+                prevBtn.click();
             }
         });
 
