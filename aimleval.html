@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Knowledge Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/4f72740924.js" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            background-image: radial-gradient(at 50% 50%, #4f46e5 0%, transparent 80%), radial-gradient(at 0% 100%, #1f2937 0%, #111827 50%), radial-gradient(at 100% 0%, #4f46e5 0%, #111827 50%);
+            background-repeat: no-repeat;
+        }
+        .draggable {
+            cursor: grab;
+            transition: all 0.3s ease-in-out;
+        }
+        .drag-over {
+            border-color: #60a5fa;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .glassmorphic-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .glassmorphic-inner {
+            background-color: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px) saturate(150%);
+            -webkit-backdrop-filter: blur(5px) saturate(150%);
+        }
+        .custom-radio-container input:checked ~ .custom-radio {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        .custom-radio-container input:checked ~ .custom-radio i {
+            display: block;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <!-- Name Input Section -->
+    <div id="name-prompt" class="glassmorphic-card p-6 md:p-10 rounded-3xl w-full max-w-md mx-auto space-y-6 text-center">
+        <h2 class="text-2xl md:text-3xl font-extrabold text-gray-100">Welcome </h2>
+        <p class="text-sm md:text-md text-gray-300">Let's begin</p>
+        <input type="text" id="user-name-input" placeholder="Your Name" class="w-full p-3 rounded-lg bg-gray-700/50 text-white placeholder-gray-400 border-2 border-gray-600 focus:outline-none focus:border-blue-500">
+        <button id="start-btn" class="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105">
+            Start Test
+        </button>
+    </div>
+
+    <!-- Main Test Content -->
+    <div id="test-content" class="glassmorphic-card p-6 md:p-10 rounded-3xl w-full max-w-5xl mx-auto space-y-8 md:space-y-12 transition-all duration-300 hidden">
+        <header class="text-center">
+            <h1 id="test-title" class="text-3xl md:text-5xl font-extrabold text-gray-100 mb-2"></h1>
+            <p class="text-sm md:text-lg text-gray-300 font-medium">Drag and drop to build a complex ML pipeline and select the right model for each use case.</p>
+        </header>
+
+        <section class="space-y-6 md:space-y-10">
+            <!-- Part 1: Algorithm Use Cases -->
+            <div>
+                <h2 class="text-xl md:text-2xl font-bold text-gray-100 mb-4">1. Choose the Right Model</h2>
+                <div id="usecase-questions" class="space-y-6">
+                    <!-- Questions will be injected here by JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Part 2: ML Pipeline Drag & Drop -->
+            <div>
+                <h2 class="text-xl md:text-2xl font-bold text-gray-100 mb-4">2. Build the Pipeline</h2>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-6">
+                    <div id="pipeline-palette" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full md:w-auto">
+                        <!-- Draggable elements will be injected here -->
+                    </div>
+                </div>
+                <div id="pipeline-target" class="border-4 border-dashed border-gray-600 rounded-2xl p-6 min-h-[150px] transition-all duration-300 flex flex-col md:flex-row items-center justify-start gap-4 md:gap-6 flex-wrap">
+                    <span class="text-gray-400 font-medium text-center w-full">Drag and drop the pipeline stages here in the correct order.</span>
+                </div>
+            </div>
+
+            <!-- Buttons and Results -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+                <button id="submit-btn" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105">
+                    Submit Test
+                </button>
+                <button id="reset-btn" class="px-6 py-3 bg-gray-600 text-white font-semibold rounded-full shadow-lg hover:bg-gray-700 transition-all duration-300 transform hover:scale-105">
+                    Reset
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" class="hidden mt-8 p-6 glassmorphic-inner rounded-2xl">
+                <h3 class="text-2xl font-bold text-gray-100 mb-4 text-center">Your Results</h3>
+                <p id="score-text" class="text-center text-xl font-semibold mb-6 text-gray-200"></p>
+                <div id="pipeline-feedback" class="mb-6"></div>
+                <div id="usecase-feedback"></div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Modal for submission message -->
+    <div id="submission-modal" class="modal">
+        <div class="modal-content glassmorphic-card text-gray-100">
+            <h4 class="text-xl font-bold mb-4">Submission Complete</h4>
+            <p id="submission-message" class="mb-6"></p>
+            <button id="close-modal-btn" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors">Close</button>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const namePrompt = document.getElementById('name-prompt');
+            const testContent = document.getElementById('test-content');
+            const userNameInput = document.getElementById('user-name-input');
+            const startBtn = document.getElementById('start-btn');
+            const pipelineTarget = document.getElementById('pipeline-target');
+            const submitBtn = document.getElementById('submit-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const resultsDiv = document.getElementById('results');
+            const scoreText = document.getElementById('score-text');
+            const pipelineFeedback = document.getElementById('pipeline-feedback');
+            const usecaseFeedback = document.getElementById('usecase-feedback');
+            const submissionModal = document.getElementById('submission-modal');
+            const submissionMessage = document.getElementById('submission-message');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const usecaseQuestionsContainer = document.getElementById('usecase-questions');
+            const pipelinePaletteContainer = document.getElementById('pipeline-palette');
+            const testTitle = document.getElementById('test-title');
+            
+            let userName = '';
+            let currentTestSet = {};
+
+            const testSets = [
+                {
+                    title: "LLM Pipeline & Model Test",
+                    pipeline_options: [
+                        {id: "data-collection", label: "Data Collection & Curation", color: "bg-purple-600/80"},
+                        {id: "text-preprocessing", label: "Text Preprocessing & Tokenization", color: "bg-yellow-600/80"},
+                        {id: "embedding-generation", label: "Embedding Generation", color: "bg-green-600/80"},
+                        {id: "model-training", label: "Model Training", color: "bg-orange-600/80"},
+                        {id: "hyperparameter-tuning", label: "Hyperparameter Tuning", color: "bg-pink-600/80"},
+                        {id: "fine-tuning", label: "Fine-Tuning & Prompt Engineering", color: "bg-cyan-600/80"},
+                        {id: "model-evaluation", label: "Model Evaluation & Human-in-the-Loop", color: "bg-blue-600/80"},
+                        {id: "inference-serving", label: "Inference & API Serving", color: "bg-red-600/80"},
+                        {id: "monitoring", label: "Performance Monitoring & Drift Detection", color: "bg-gray-600/80"}
+                    ],
+                    pipeline_correct_order: ['data-collection', 'text-preprocessing', 'embedding-generation', 'model-training', 'hyperparameter-tuning', 'fine-tuning', 'model-evaluation', 'inference-serving', 'monitoring'],
+                    use_cases: [
+                        {
+                            question: "Use Case: Generating a concise summary from a long article.",
+                            options: ["K-Means", "Transformer-based Model (e.g., T5, BART)", "Linear Regression", "Decision Tree"],
+                            correct: "Transformer-based Model (e.g., T5, BART)",
+                            reasoning: "Transformer models like T5 and BART are specifically designed for sequence-to-sequence tasks, making them highly effective for text summarization."
+                        },
+                        {
+                            question: "Use Case: Classifying customer reviews as positive, negative, or neutral.",
+                            options: ["Recurrent Neural Network (RNN)", "K-Means", "Decision Tree", "Random Forest"],
+                            correct: "Recurrent Neural Network (RNN)",
+                            reasoning: "RNNs are well-suited for sentiment analysis as they can process sequences of text and understand the context and flow of the words to determine overall sentiment."
+                        },
+                        {
+                            question: "Use Case: Providing specific answers to user questions from a large text corpus.",
+                            options: ["Linear Regression", "Convolutional Neural Network (CNN)", "Transformer Model", "K-Nearest Neighbors"],
+                            correct: "Transformer Model",
+                            reasoning: "Transformer models are at the core of modern question-answering systems, as they excel at understanding context and relationships between words in a large document to extract precise answers."
+                        },
+                        {
+                            question: "Use Case: Generating Python code from a natural language prompt.",
+                            options: ["Naive Bayes", "K-Means", "Transformer-based Code Model (e.g., Codex)", "Support Vector Machine"],
+                            correct: "Transformer-based Code Model (e.g., Codex)",
+                            reasoning: "Models like Codex are trained on vast amounts of code and text, allowing them to understand natural language instructions and translate them into executable code."
+                        }
+                    ]
+                },
+                {
+                    title: "Computer Vision Pipeline & Model Test",
+                    pipeline_options: [
+                        {id: "image-collection", label: "Image Data Collection", color: "bg-purple-600/80"},
+                        {id: "image-preprocessing", label: "Image Preprocessing (Resizing, Normalization)", color: "bg-yellow-600/80"},
+                        {id: "feature-extraction", label: "Feature Extraction", color: "bg-green-600/80"},
+                        {id: "model-training-cv", label: "Model Training", color: "bg-orange-600/80"},
+                        {id: "model-evaluation-cv", label: "Model Evaluation", color: "bg-blue-600/80"},
+                        {id: "deployment-cv", label: "Deployment", color: "bg-red-600/80"},
+                        {id: "monitoring-cv", label: "Monitoring", color: "bg-gray-600/80"}
+                    ],
+                    pipeline_correct_order: ["image-collection", "image-preprocessing", "feature-extraction", "model-training-cv", "model-evaluation-cv", "deployment-cv", "monitoring-cv"],
+                    use_cases: [
+                        {
+                            question: "Use Case: Classifying images of cats vs. dogs.",
+                            options: ["Decision Tree", "Linear Regression", "Convolutional Neural Network (CNN)", "K-Means"],
+                            correct: "Convolutional Neural Network (CNN)",
+                            reasoning: "CNNs are the industry standard for image classification due to their ability to automatically learn and extract hierarchical features from image data."
+                        },
+                        {
+                            question: "Use Case: Detecting faces and their location in an image.",
+                            options: ["Transformer Model", "Random Forest", "Object Detection Model (e.g., YOLO, R-CNN)", "Support Vector Machine"],
+                            correct: "Object Detection Model (e.g., YOLO, R-CNN)",
+                            reasoning: "Object detection models are designed to identify objects and their specific locations within an image, which is exactly what facial recognition requires."
+                        },
+                        {
+                            question: "Use Case: Identifying different objects in an image and outlining their boundaries.",
+                            options: ["K-Nearest Neighbors", "Image Segmentation Model (e.g., U-Net)", "Naive Bayes", "RNN"],
+                            correct: "Image Segmentation Model (e.g., U-Net)",
+                            reasoning: "Image segmentation models go beyond object detection to classify each pixel in an image, effectively outlining the boundaries of objects."
+                        }
+                    ]
+                },
+                {
+                    title: "Time Series & Forecasting Test",
+                    pipeline_options: [
+                        {id: "ts-data-collection", label: "Time Series Data Collection", color: "bg-purple-600/80"},
+                        {id: "data-cleaning-ts", label: "Data Cleaning & Imputation", color: "bg-yellow-600/80"},
+                        {id: "feature-engineering-ts", label: "Feature Engineering (Lag features, rolling averages)", color: "bg-green-600/80"},
+                        {id: "model-selection-ts", label: "Model Selection (ARIMA, Prophet)", color: "bg-orange-600/80"},
+                        {id: "forecasting", label: "Forecasting", color: "bg-pink-600/80"},
+                        {id: "model-evaluation-ts", label: "Model Evaluation", color: "bg-blue-600/80"},
+                        {id: "deployment-ts", label: "Deployment", color: "bg-red-600/80"}
+                    ],
+                    pipeline_correct_order: ["ts-data-collection", "data-cleaning-ts", "feature-engineering-ts", "model-selection-ts", "forecasting", "model-evaluation-ts", "deployment-ts"],
+                    use_cases: [
+                        {
+                            question: "Use Case: Predicting the next month's sales for a retail store.",
+                            options: ["Logistic Regression", "ARIMA Model", "CNN", "K-Means"],
+                            correct: "ARIMA Model",
+                            reasoning: "ARIMA (AutoRegressive Integrated Moving Average) is a classic and effective statistical model specifically designed for time series forecasting."
+                        },
+                        {
+                            question: "Use Case: Detecting unusual CPU usage spikes in a server monitoring log.",
+                            options: ["Anomaly Detection", "Image Segmentation", "Decision Tree", "Naive Bayes"],
+                            correct: "Anomaly Detection",
+                            reasoning: "This is a classic anomaly detection problem, where the model identifies data points that deviate significantly from the expected pattern."
+                        },
+                        {
+                            question: "Use Case: Forecasting hourly electricity consumption based on historical data.",
+                            options: ["Linear Regression", "Recurrent Neural Network (RNN)", "Random Forest", "Support Vector Machine"],
+                            correct: "Recurrent Neural Network (RNN)",
+                            reasoning: "RNNs, particularly LSTMs, are powerful for time series forecasting as they can learn and remember patterns over long sequences of data."
+                        }
+                    ]
+                },
+                {
+                    title: "Traditional ML Test",
+                    pipeline_options: [
+                        {id: "data-collection-trad", label: "Data Collection", color: "bg-purple-600/80"},
+                        {id: "data-cleaning-trad", label: "Data Cleaning", color: "bg-yellow-600/80"},
+                        {id: "feature-selection", label: "Feature Selection & Engineering", color: "bg-green-600/80"},
+                        {id: "model-selection-trad", label: "Model Selection", color: "bg-orange-600/80"},
+                        {id: "model-training-trad", label: "Model Training", color: "bg-pink-600/80"},
+                        {id: "model-evaluation-trad", label: "Model Evaluation", color: "bg-blue-600/80"},
+                        {id: "hyperparameter-tuning-trad", label: "Hyperparameter Tuning", color: "bg-cyan-600/80"},
+                        {id: "deployment-trad", label: "Deployment", color: "bg-red-600/80"}
+                    ],
+                    pipeline_correct_order: ["data-collection-trad", "data-cleaning-trad", "feature-selection", "model-selection-trad", "model-training-trad", "model-evaluation-trad", "hyperparameter-tuning-trad", "deployment-trad"],
+                    use_cases: [
+                        {
+                            question: "Use Case: Predicting house prices based on features like size, location, and number of bedrooms.",
+                            options: ["K-Means", "Logistic Regression", "Linear Regression", "Naive Bayes"],
+                            correct: "Linear Regression",
+                            reasoning: "This is a classic regression problem. Linear Regression is a simple and effective model for predicting a continuous numerical value like a house price."
+                        },
+                        {
+                            question: "Use Case: Classifying an email as spam or not spam.",
+                            options: ["Support Vector Machine (SVM)", "K-Means", "ARIMA", "CNN"],
+                            correct: "Support Vector Machine (SVM)",
+                            reasoning: "SVMs are powerful and perform well on binary classification tasks like spam detection by finding the optimal hyperplane to separate the data points."
+                        },
+                        {
+                            question: "Use Case: Grouping similar customers together for targeted marketing campaigns.",
+                            options: ["Decision Tree", "Random Forest", "K-Means", "Linear Regression"],
+                            correct: "K-Means",
+                            reasoning: "K-Means is a popular unsupervised clustering algorithm used to group similar data points (customers) into distinct clusters."
+                        }
+                    ]
+                },
+                {
+                    title: "Recommendation System & Model Test",
+                    pipeline_options: [
+                        {id: "user-item-data", label: "User & Item Data Collection", color: "bg-purple-600/80"},
+                        {id: "interaction-logging", label: "User-Item Interaction Logging", color: "bg-yellow-600/80"},
+                        {id: "filtering", label: "Collaborative or Content-Based Filtering", color: "bg-green-600/80"},
+                        {id: "model-training-recommender", label: "Model Training", color: "bg-orange-600/80"},
+                        {id: "offline-evaluation", label: "Offline Evaluation (Precision, Recall)", color: "bg-blue-600/80"},
+                        {id: "online-evaluation", label: "Online Evaluation (A/B Testing)", color: "bg-cyan-600/80"},
+                        {id: "real-time-serving", label: "Real-time Serving", color: "bg-red-600/80"}
+                    ],
+                    pipeline_correct_order: ["user-item-data", "interaction-logging", "filtering", "model-training-recommender", "offline-evaluation", "online-evaluation", "real-time-serving"],
+                    use_cases: [
+                        {
+                            question: "Use Case: Recommending movies to a user based on what similar users have watched.",
+                            options: ["Content-Based Filtering", "Linear Regression", "Collaborative Filtering", "Decision Tree"],
+                            correct: "Collaborative Filtering",
+                            reasoning: "Collaborative filtering is a recommendation method that makes predictions about a user's interests based on the interests of other users with similar tastes."
+                        },
+                        {
+                            question: "Use Case: Recommending a news article to a user based on the content of articles they have previously read.",
+                            options: ["K-Means", "Content-Based Filtering", "Naive Bayes", "RNN"],
+                            correct: "Content-Based Filtering",
+                            reasoning: "Content-based filtering recommends items that are similar to items the user has liked in the past, based on item features."
+                        },
+                        {
+                            question: "Use Case: Recommending products to a new user with no purchase history.",
+                            options: ["Cold Start Recommendation", "Anomaly Detection", "ARIMA", "CNN"],
+                            correct: "Cold Start Recommendation",
+                            reasoning: "The 'cold start' problem is a common challenge in recommendation systems when there is not enough data to make personalized recommendations for new users or items. This is often solved with popularity-based or hybrid methods."
+                        }
+                    ]
+                }
+            ];
+
+            const renderTestSet = (testSet) => {
+                testTitle.textContent = testSet.title;
+                
+                // Render use case questions
+                usecaseQuestionsContainer.innerHTML = '';
+                testSet.use_cases.forEach((useCase, index) => {
+                    let optionsHtml = useCase.options.map(option => `
+                        <label class="custom-radio-container flex items-center p-3 rounded-lg border-2 border-gray-500 transition-colors duration-200 cursor-pointer hover:bg-white/10">
+                            <input type="radio" name="usecase${index + 1}" value="${option}" class="hidden">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-400 mr-3 flex-shrink-0 flex items-center justify-center custom-radio transition-all duration-200">
+                                <i class="fa-solid fa-check text-white text-xs hidden"></i>
+                            </div>
+                            <span class="text-gray-200 font-medium">${option}</span>
+                        </label>
+                    `).join('');
+                    
+                    const questionHtml = `
+                        <div class="glassmorphic-inner p-6 rounded-xl transition-all duration-300 hover:bg-white/10">
+                            <p class="font-bold text-gray-200 text-lg mb-4">${useCase.question}</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                ${optionsHtml}
+                            </div>
+                        </div>
+                    `;
+                    usecaseQuestionsContainer.innerHTML += questionHtml;
+                });
+
+                // Render pipeline palette
+                pipelinePaletteContainer.innerHTML = '';
+                testSet.pipeline_options.forEach(option => {
+                    const optionHtml = `
+                        <div id="${option.id}" class="draggable p-4 ${option.color} text-white rounded-xl shadow-md text-center hover:scale-105" draggable="true">
+                            ${option.label}
+                        </div>
+                    `;
+                    pipelinePaletteContainer.innerHTML += optionHtml;
+                });
+                
+                // Re-attach drag listeners
+                const draggables = document.querySelectorAll('.draggable');
+                draggables.forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', e.target.id);
+                        setTimeout(() => e.target.classList.add('opacity-50'), 0);
+                    });
+                    item.addEventListener('dragend', (e) => {
+                        e.target.classList.remove('opacity-50');
+                    });
+                });
+            };
+
+            // Start button logic
+            startBtn.addEventListener('click', () => {
+                const name = userNameInput.value.trim();
+                if (name) {
+                    userName = name;
+                    namePrompt.classList.add('hidden');
+                    testContent.classList.remove('hidden');
+                    const randomIndex = Math.floor(Math.random() * testSets.length);
+                    currentTestSet = testSets[randomIndex];
+                    renderTestSet(currentTestSet);
+                } else {
+                    submissionMessage.textContent = 'Please enter your name to begin the test.';
+                    submissionModal.style.display = 'flex';
+                }
+            });
+
+            // Drag and Drop Events
+            pipelineTarget.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.add('drag-over');
+            });
+
+            pipelineTarget.addEventListener('dragleave', (e) => {
+                e.currentTarget.classList.remove('drag-over');
+            });
+
+            pipelineTarget.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('drag-over');
+                const data = e.dataTransfer.getData('text/plain');
+                const droppedElement = document.getElementById(data);
+                if (droppedElement) {
+                    const placeholder = pipelineTarget.querySelector('span');
+                    if (placeholder) {
+                        placeholder.remove();
+                    }
+                    pipelineTarget.appendChild(droppedElement);
+                }
+            });
+
+            // Submission and Scoring
+            submitBtn.addEventListener('click', () => {
+                let score = 0;
+                let totalQuestions = 0;
+                let feedbackHtml = '';
+
+                // Score the pipeline
+                totalQuestions++;
+                const droppedElements = Array.from(pipelineTarget.children);
+                const pipelineCorrect = droppedElements.every((el, index) => el.id === currentTestSet.pipeline_correct_order[index]);
+
+                if (pipelineCorrect) {
+                    score++;
+                    feedbackHtml += `<div class="p-4 rounded-xl bg-green-600/50 text-white font-semibold mb-4"><i class="fa-solid fa-check mr-2"></i> Pipeline: Correct!</div>`;
+                } else {
+                    feedbackHtml += `<div class="p-4 rounded-xl bg-red-600/50 text-white font-semibold mb-4"><i class="fa-solid fa-xmark mr-2"></i> Pipeline: Incorrect. The correct order is: ${currentTestSet.pipeline_options.map(p => p.label).join(', ')}.</div>`;
+                }
+                pipelineFeedback.innerHTML = feedbackHtml;
+
+                // Score the use cases
+                feedbackHtml = '';
+                const usecaseRadios = document.querySelectorAll('input[type="radio"]');
+                const selectedAnswers = {};
+                usecaseRadios.forEach(radio => {
+                    if (radio.checked) {
+                        selectedAnswers[radio.name] = radio.value;
+                    }
+                });
+
+                currentTestSet.use_cases.forEach((useCase, index) => {
+                    totalQuestions++;
+                    const selectedValue = selectedAnswers[`usecase${index + 1}`];
+                    const correctAnswer = useCase.correct;
+
+                    if (selectedValue === correctAnswer) {
+                        score++;
+                        feedbackHtml += `<div class="p-4 rounded-xl bg-green-600/50 text-white font-semibold mb-2">
+                            <i class="fa-solid fa-check mr-2"></i> ${useCase.question} <br>
+                            Your choice: <span class="text-sm font-normal"> ${selectedValue} (Correct)</span><br>
+                            <span class="text-sm font-normal">Reasoning: ${useCase.reasoning}</span>
+                        </div>`;
+                    } else {
+                        feedbackHtml += `<div class="p-4 rounded-xl bg-red-600/50 text-white font-semibold mb-2">
+                            <i class="fa-solid fa-xmark mr-2"></i> ${useCase.question} <br>
+                            Your choice: <span class="text-sm font-normal"> ${selectedValue || 'None'}.</span><br>
+                            <span class="text-sm font-normal">The correct answer is: ${correctAnswer}.</span><br>
+                            <span class="text-sm font-normal">Reasoning: ${useCase.reasoning}</span>
+                        </div>`;
+                    }
+                });
+                
+                usecaseFeedback.innerHTML = feedbackHtml;
+                
+                // Show final score and modal
+                scoreText.textContent = `${userName}'s total score: ${score} / ${totalQuestions}`;
+                resultsDiv.classList.remove('hidden');
+                resultsDiv.scrollIntoView({ behavior: 'smooth' });
+                
+                submissionMessage.textContent = `Thank you for completing the test, ${userName}! Your final score is: ${score} / ${totalQuestions}.`;
+                submissionModal.style.display = 'flex';
+            });
+
+            // Reset Functionality
+            resetBtn.addEventListener('click', () => {
+                // Reset pipeline
+                pipelineTarget.innerHTML = `<span class="text-gray-400 font-medium text-center w-full">Drag and drop the pipeline stages here in the correct order.</span>`;
+                
+                // Reset radio buttons
+                const usecaseRadios = document.querySelectorAll('input[type="radio"]');
+                usecaseRadios.forEach(radio => radio.checked = false);
+
+                // Hide results
+                resultsDiv.classList.add('hidden');
+                pipelineFeedback.innerHTML = '';
+                usecaseFeedback.innerHTML = '';
+
+                // Render the same test set again for a new attempt
+                renderTestSet(currentTestSet);
+            });
+            
+            // Modal close button
+            closeModalBtn.addEventListener('click', () => {
+                submissionModal.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
