@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UI/UX • Figma • AI Tools — Glassmorphic Deck</title>
+  <style>
+    :root{
+      --bg1:#0e0f1b;--bg2:#081226;
+      --accent:#7bdff6;--accent2:#3b82f6;--accent3:#9333ea;--accent4:#f472b6;--accent5:#22d3ee;
+      --glass-border:rgba(255,255,255,.22);
+      --text:#eef2ff;--muted:#c7c9d6;
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--text);overflow:hidden}
+
+    #bg3d{position:fixed;inset:0;z-index:0;display:block}
+
+    .deck{position:fixed;inset:0;display:grid;place-items:center;padding:3vh;z-index:1;overflow:auto}
+    .slide{width:min(1100px,92vw);min-height:min(680px,86vh);border-radius:28px;
+      background:
+        linear-gradient(145deg, rgba(59,130,246,.28), rgba(147,51,234,.20) 40%, rgba(244,114,182,.20) 70%, rgba(34,211,238,.20)),
+        linear-gradient(45deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      box-shadow:0 10px 40px rgba(0,0,0,.35),inset 0 0 0 1px var(--glass-border);
+      padding:48px 56px;margin:20px auto;display:none;position:relative}
+    .slide.active{display:block;animation:fade .5s ease}
+    @keyframes fade{from{opacity:.3;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+    h1{margin:.2em 0 .2em;font-size:48px;letter-spacing:.4px}
+    h2{margin:.2em 0 .5em;font-size:34px;color:#e8e9ff}
+    p,li{font-size:20px;line-height:1.6;color:var(--muted)}
+    .kicker{letter-spacing:.3em;color:var(--accent);font-weight:600;font-size:14px;text-transform:uppercase}
+
+    .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:18px}
+    .card{border-radius:20px;padding:18px 20px;
+      background:
+        linear-gradient(135deg, rgba(59,130,246,.28), rgba(147,51,234,.18) 50%, rgba(244,114,182,.18) 80%),
+        linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      box-shadow:inset 0 0 0 1px var(--glass-border)}
+    .muted{color:var(--muted)}
+    .accent{color:var(--accent)}
+
+    .toolbar{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:center;z-index:2}
+    .btn{background:linear-gradient(135deg,rgba(59,130,246,.35),rgba(147,51,234,.22));border:1px solid var(--glass-border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--text);border-radius:16px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btn:active{transform:translateY(1px)}
+    .progress{height:6px;width:min(1100px,92vw);border-radius:999px;background:rgba(255,255,255,.12);position:fixed;top:18px;left:50%;transform:translateX(-50%);overflow:hidden;z-index:2}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3),var(--accent4),var(--accent5));transition:width .25s ease}
+
+    .note{position:absolute;right:24px;bottom:24px;font-size:14px;color:var(--muted)}
+
+    ul.check{list-style:none;padding-left:0}
+    ul.check li{position:relative;padding-left:28px}
+    ul.check li:before{content:"✔";position:absolute;left:0;top:0;color:var(--accent)}
+
+    .pill{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;border:1px solid var(--glass-border);
+      background:linear-gradient(135deg, rgba(59,130,246,.32), rgba(147,51,234,.2), rgba(244,114,182,.2));}
+
+    .logo{position:fixed;bottom:16px;left:16px;z-index:3;width:140px;height:auto;opacity:0.9}
+
+    @media print{
+      html,body{overflow:visible}
+      .toolbar,.progress,#bg3d,.logo{display:none}
+      .deck{display:block}
+      .slide{display:block;break-after:page;height:auto;margin:16mm auto}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg3d"></canvas>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="deck" id="deck">
+    <!-- 0: Cover -->
+    <section class="slide active">
+      <div class="kicker">Workshop Deck</div>
+      <h1>UI/UX • Figma • AI Tools</h1>
+      <h2 class="muted">Glassmorphic, modern, minimalist</h2>
+      <div class="grid">
+        <div class="card"><h3>What you’ll learn</h3><ul class="check">
+          <li>UI vs UX — mental models & quick wins</li>
+          <li>Figma: frames, auto‑layout, components, prototype</li>
+          <li>AI tools to speed up flows & visuals</li>
+        </ul></div>
+        <div class="card"><h3>Hands‑on</h3><ul class="check">
+          <li>Build a glassmorphic login</li>
+          <li>Create an AI Study Buddy flow</li>
+          <li>Export & share as prototype / PDF</li>
+        </ul></div>
+      </div>
+      <div class="note">Press ← / → or click ▶ to navigate • Toggle BG below</div>
+    </section>
+
+    <!-- 1: UI vs UX -->
+    <section class="slide">
+      <div class="kicker">Fundamentals</div>
+      <h1>UI vs UX — quick analogy</h1>
+      <div class="grid">
+        <div class="card"><h3 class="pill">🎛️ UI (Look & Feel)</h3>
+          <ul class="check">
+            <li>Colors, fonts, spacing, icons</li>
+            <li>Layout & visual hierarchy</li>
+            <li>Micro‑interactions & motion</li>
+          </ul>
+        </div>
+        <div class="card"><h3 class="pill">🗺️ UX (Ease & Flow)</h3>
+          <ul class="check">
+            <li>Navigation & information scent</li>
+            <li>Task completion time & errors</li>
+            <li>Delight, accessibility, trust</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>Mini‑quiz</h3>
+        <p class="muted">“The app loads slowly” — UI or UX?</p>
+        <div class="grid" style="grid-template-columns:repeat(2,auto);gap:12px">
+          <button class="btn" onclick="quiz('ux')">UX</button>
+          <button class="btn" onclick="quiz('ui')">UI</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2: Colors & Fonts -->
+    <section class="slide">
+      <div class="kicker">Design System</div>
+      <h1>Colors & Typography</h1>
+      <div class="grid">
+        <div class="card"><h3 class="pill">🎨 Color cues</h3>
+          <p><span class="accent">Blue</span> = trust • <span class="accent">Green</span> = growth • <span class="accent">Red</span> = energy • <span class="accent">Yellow</span> = alert</p>
+          <p class="muted">Use 60/30/10 rule for primary / secondary / accent.</p>
+        </div>
+        <div class="card"><h3 class="pill">🔤 Type picks</h3>
+          <p><b>Inter / Poppins</b> for UI; pair with size scale 12–32. Maintain 4–8px baseline grid.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3: Figma Deep Dive -->
+    <section class="slide">
+      <div class="kicker">Figma</div>
+      <h1>Figma — deeper basics</h1>
+      <div class="grid">
+        <div class="card"><h3 class="pill">🧱 Core concepts</h3>
+          <ul class="check">
+            <li>Frames (F), Text (T), Auto‑layout (⇧A)</li>
+            <li>Components & Variants (states, sizes)</li>
+            <li>Constraints & layout grids</li>
+          </ul></div>
+        <div class="card"><h3 class="pill">🧩 Prototyping</h3>
+          <ul class="check">
+            <li>Flows, overlays, Smart Animate</li>
+            <li>Interactive components (hover/click)</li>
+            <li>Device preview & share link</li>
+          </ul></div>
+        <div class="card"><h3 class="pill">💻 For Devs</h3>
+          <ul class="check">
+            <li>Dev Mode: specs, CSS/Swift/Kotlin code</li>
+            <li>Design tokens with Variables</li>
+            <li>Export: PNG/SVG/PDF; inspect</li>
+          </ul></div>
+      </div>
+    </section>
+
+    <!-- 4: Figma Timeline (Horizontal) -->
+    <section class="slide">
+      <div class="kicker">History</div>
+      <h1>How Figma evolved</h1>
+      <div class="timelineX">
+        <div class="tl-track">
+          <div class="tl-item">
+            <div class="tl-year">2012</div>
+            <div class="tl-card"><b>Founding</b><br/> Dylan Field & Evan Wallace start a web‑native design tool vision.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2016</div>
+            <div class="tl-card"><b>Public Preview</b><br/> Real‑time multiplayer editing lands — the killer feature.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2019</div>
+            <div class="tl-card"><b>Plugins + Community</b><br/> Ecosystem explodes; sharing & reuse go mainstream.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2021</div>
+            <div class="tl-card"><b>FigJam</b><br/> Collaborative whiteboarding for teams.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2023</div>
+            <div class="tl-card"><b>Variables & Dev Mode</b><br/> Tokens, modes, and better handoff.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2024</div>
+            <div class="tl-card"><b>Figma AI (preview)</b><br/> Smarter asset search, autocomplete, text‑to‑UI.</div>
+          </div>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:8px">*Horizontal, scrollable timeline. Drag horizontally if needed.</p>
+    </section>
+
+    <!-- 5: AI Study Buddy Flow -->
+    <section class="slide">
+      <div class="kicker">Hands‑on</div>
+      <h1>AI Study Buddy — screens</h1>
+      <div class="grid">
+        <div class="card"><h3 class="pill">📲 Onboarding</h3><p class="muted">Gradient bg + glass panel, CTA “Get Started”.</p></div>
+        <div class="card"><h3 class="pill">🏠 Home</h3><p class="muted">Search, chips (Math, History…), CTA “Chat with Study Buddy”.</p></div>
+        <div class="card"><h3 class="pill">🤖 AI Chat</h3><p class="muted">Chat bubbles; input field; quick actions.</p></div>
+        <div class="card"><h3 class="pill">📝 Quiz</h3><p class="muted">MCQs in glass cards; Submit button.</p></div>
+        <div class="card"><h3 class="pill">📈 Progress</h3><p class="muted">Bar chart card, streak badge 🔥.</p></div>
+      </div>
+    </section>
+
+    <!-- 6: AI Tools -->
+    <section class="slide">
+      <div class="kicker">Accelerators</div>
+      <h1>AI tools that help</h1>
+      <ul class="check">
+        <li>✨ <b>Uizard</b> — sketch → screen</li>
+        <li>🧶 <b>Stitch / Galileo</b> — prompt → mockups</li>
+        <li>🔤 <b>FontJoy</b> — font pairing</li>
+        <li>🎨 <b>Khroma</b> — palette generator</li>
+        <li>🪄 <b>Magician (Figma)</b> — on‑canvas AI</li>
+      </ul>
+    </section>
+
+    <!-- 7: Activity -->
+    <section class="slide">
+      <div class="kicker">Activity (10 min)</div>
+      <h1>Build a glassmorphic login</h1>
+      <ol>
+        <li>Create mobile frame → add gradient bg</li>
+        <li>Glass card: white @ 20% + blur 18px</li>
+        <li>Logo, headline, inputs, CTA</li>
+        <li>Duplicate → Home; link with Prototype</li>
+      </ol>
+      <p class="note">Bonus: add success micro‑animation in Prototype</p>
+    </section>
+
+    <!-- 8: Shortcuts & Best Practices -->
+    <section class="slide">
+      <div class="kicker">Pro Tips</div>
+      <h1>Shortcuts & habits that scale</h1>
+      <div class="grid">
+        <div class="card"><h3 class="pill">⌨️ Shortcuts</h3>
+          <p class="muted">F = Frame • T = Text • ⇧A = Auto‑layout • ⌥ drag = duplicate • / = quick search</p>
+        </div>
+        <div class="card"><h3 class="pill">🧱 Best practices</h3>
+          <ul class="check">
+            <li>8‑pt spacing; name layers & use sections</li>
+            <li>Make components early; create variants</li>
+            <li>Use Variables for color/type/spacing tokens</li>
+          </ul>
+        </div>
+        <div class="card"><h3 class="pill">🤝 Collaboration</h3>
+          <ul class="check">
+            <li>Branches for safe edits</li>
+            <li>Comments & mention reviewers</li>
+            <li>Hand‑off via Dev Mode</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9: Figma Plugins to install -->
+    <section class="slide">
+      <div class="kicker">Toolkit</div>
+      <h1>Must‑have Figma plugins</h1>
+      <div class="grid">
+        <div class="card"><h3 class="pill">🧩 Component Utilities</h3><p class="muted">Batch rename, instance swap, tidy layers.</p></div>
+        <div class="card"><h3 class="pill">🖼️ Iconify</h3><p class="muted">100k+ icons (Feather, Material, Lucide…).</p></div>
+        <div class="card"><h3 class="pill">🧪 Contrast</h3><p class="muted">AAA/AA checks for text contrast.</p></div>
+        <div class="card"><h3 class="pill">🧭 Autolayout Magic</h3><p class="muted">Quick stacks, gaps, padding presets.</p></div>
+        <div class="card"><h3 class="pill">📐 Grids & Spacing</h3><p class="muted">8‑pt grid helpers & baseline overlays.</p></div>
+      </div>
+    </section>
+
+    <!-- 10: Accessibility checklist -->
+    <section class="slide">
+      <div class="kicker">Inclusive UX</div>
+      <h1>Accessibility — quick checks</h1>
+      <ul class="check">
+        <li>Color contrast ≥ AA (4.5:1 text)</li>
+        <li>Hit area ≥ 44×44 px</li>
+        <li>Keyboard focus visible & logical order</li>
+        <li>Alt text for images & icons when needed</li>
+        <li>Support reduce‑motion user setting</li>
+      </ul>
+    </section>
+
+    <!-- 11: Case study mini -->
+    <section class="slide">
+      <div class="kicker">Case Study</div>
+      <h1>Before → After (micro‑redesign)</h1>
+      <div class="grid">
+        <div class="card"><h3>Before</h3><p class="muted">Cluttered nav, weak contrast, unclear CTAs.</p></div>
+        <div class="card"><h3>After</h3><p class="muted">Clear hierarchy, primary CTA, improved spacing, helpful empty states.</p></div>
+        <div class="card"><h3>Impact</h3><p class="muted">Time‑to‑task ↓ 32% • Error rate ↓ 18% • CSAT ↑</p></div>
+      </div>
+    </section>
+
+    <!-- 12: Closing -->
+    <section class="slide">
+      <div class="kicker">Wrap</div>
+      <h1>Q&A • Resources</h1>
+      <div class="grid">
+        <div class="card"><h3>Starter kits</h3><p class="muted">Figma Community: iOS, Material 3, Web UI kits</p></div>
+        <div class="card"><h3>Read / Watch</h3><p class="muted">Laws of UX • Refactoring UI • Figma YouTube</p></div>
+        <div class="card"><h3>Next steps</h3><p class="muted">Clone this deck • Export as PDF • Share link</p></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn" id="prev">← Prev</button>
+    <button class="btn" id="next">Next →</button>
+    <button class="btn" id="toggleBg">BG: On</button>
+    <label class="btn" style="display:flex;gap:8px;align-items:center">Speed <input id="speed" type="range" min="0" max="2" step="0.05" value="1"></label>
+    <button class="btn" id="print">Export PDF</button>
+  </div>
+
+  <img src="https://experimentlabs.in/assets/Experimentlabs_logo-D8clN1f6.svg" alt="Experimentlabs Logo" class="logo" />
+
+  <script>
+    const slides=[...document.querySelectorAll('.slide')];
+    let i=0; const bar=document.getElementById('bar');
+    const setActive=(n)=>{slides[i].classList.remove('active');i=(n+slides.length)%slides.length;slides[i].classList.add('active');if(bar) bar.style.width=((i)/(slides.length-1))*100+'%'};
+    document.getElementById('next').onclick=()=>setActive(i+1);
+    document.getElementById('prev').onclick=()=>setActive(i-1);
+    document.getElementById('print').onclick=()=>window.print();
+    addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();setActive(i+1)};if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();setActive(i-1)}});
+    addEventListener('click',e=>{if(e.target.closest('.btn')) return; setActive(i+1)});
+    let touchStartX=null; addEventListener('touchstart',e=>{touchStartX=e.changedTouches[0].screenX}); addEventListener('touchend',e=>{const dx=e.changedTouches[0].screenX-touchStartX; if(Math.abs(dx)>30){ setActive(i+(dx<0?1:-1))}});
+
+    function quiz(ans){alert(ans==='ux'?'✅ Correct: Performance & speed are UX.':'❌ That is mostly a UX issue. UI is visuals.');}
+    window.quiz=quiz;
+
+    const canvas=document.getElementById('bg3d');
+    const ctx=canvas.getContext('2d');
+    let bgOn=true; let speed=1; let w=0,h=0, dpr=1;
+
+    const resize=()=>{
+      dpr=window.devicePixelRatio||1; w=innerWidth; h=innerHeight;
+      canvas.width=w*dpr; canvas.height=h*dpr; canvas.style.width=w+'px'; canvas.style.height=h+'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }; window.addEventListener('resize',resize); resize();
+
+    const COUNT=280; const particles=[];
+    const rand=(a,b)=>a+Math.random()*(b-a);
+    const colors=['rgba(59,130,246,1)','rgba(123,223,246,1)','rgba(147,51,234,1)','rgba(244,114,182,1)','rgba(34,211,238,1)'];
+    for(let i=0;i<COUNT;i++){
+      particles.push({
+        x:rand(0,w), y:rand(0,h), z:rand(0.2,1),
+        vx:rand(-0.2,0.2), vy:rand(0.1,0.6), r:rand(0.6,2.2),
+        color:colors[(Math.random()*colors.length)|0]
+      });
+    }
+
+    function tick(){
+      requestAnimationFrame(tick);
+      if(!bgOn) return;
+      ctx.clearRect(0,0,w,h);
+      const g1=ctx.createRadialGradient(w*0.2,h*0.3,10,w*0.2,h*0.3,520);
+      g1.addColorStop(0,'rgba(59,130,246,0.15)'); g1.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g1; ctx.fillRect(0,0,w,h);
+      const g2=ctx.createRadialGradient(w*0.8,h*0.2,10,w*0.8,h*0.2,460);
+      g2.addColorStop(0,'rgba(147,51,234,0.12)'); g2.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g2; ctx.fillRect(0,0,w,h);
+
+      ctx.globalCompositeOperation='lighter';
+      for(const p of particles){
+        p.x+=p.vx*speed; p.y+=p.vy*speed;
+        if(p.x<-50) p.x=w+50; if(p.x>w+50) p.x=-50;
+        if(p.y>h+50){ p.y=-50; p.x=rand(0,w); }
+        const r=p.r*(0.5+p.z*0.5);
+        const grad=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r*6);
+        grad.addColorStop(0,p.color.replace('1)','0.9)'));
+        grad.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=grad;
+        ctx.beginPath(); ctx.arc(p.x,p.y,r,0,Math.PI*2); ctx.fill();
+      }
+      ctx.globalCompositeOperation='source-over';
+    }
+    tick();
+
+    const toggle=document.getElementById('toggleBg');
+    toggle.onclick=()=>{bgOn=!bgOn; if(!bgOn){const {width,height}=canvas; ctx.clearRect(0,0,width,height);} toggle.textContent='BG: '+(bgOn?'On':'Off')};
+    document.getElementById('speed').oninput=(e)=>{speed=parseFloat(e.target.value)}
+  </script>
+</body>
+</html>
