@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Solving Modern Indian Problems with AI & Hardware</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <!-- Three.js Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <style>
+    /* GLOBAL RESET & SETUP */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    :root {
+      --bg1: #26121a;
+      --bg2: #021f2b;
+      --glass: #ffffff1a;
+      --stroke: #ffffff26;
+      --txt: #e6f6ff;
+      --muted: #b6c7d1;
+      --accent: #f97316; /* Saffron/Orange for a modern Indian feel */
+      --hot: #3b82f6;   /* Blue for technology */
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow-y: auto; 
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--txt);
+      background: radial-gradient(1200px 1200px at 10% -10%, #652d12 0%, transparent 40%),
+                  radial-gradient(900px 900px at 110% 10%, #1e3a8a 0%, transparent 45%),
+                  radial-gradient(800px 800px at 50% 120%, #082f49 0%, transparent 45%),
+                  linear-gradient(160deg, var(--bg1), var(--bg2));
+    }
+
+    /* BACKGROUND DECORATIONS */
+    .blob { position: fixed; filter: blur(60px); opacity: .35; pointer-events: none; z-index: -1; }
+    .blob.b1 { width: 50vmax; height: 50vmax; left: -10vmax; top: -15vmax; background: radial-gradient(circle at 30% 30%, var(--accent), transparent 60%); }
+    .blob.b2 { width: 40vmax; height: 40vmax; right: -8vmax; top: -8vmax; background: radial-gradient(circle at 60% 40%, var(--hot), transparent 60%); }
+    .blob.b3 { width: 45vmax; height: 45vmax; left: 10vmax; bottom: -15vmax; background: radial-gradient(circle at 50% 50%, #15803d, transparent 60%); }
+    .grain { pointer-events: none; position: fixed; inset: 0; z-index: -1; opacity: .08; mix-blend-mode:soft-light; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.5"/></svg>'); background-size: 320px 320px; }
+
+    /* DECK & SLIDE STRUCTURE */
+    .deck {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 0;
+    }
+    .slide {
+      display: none;
+      width: 100%;
+      justify-content: center;
+      padding: 0 24px;
+    }
+    .slide.active {
+      display: grid;
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    /* GLASSMORPHISM UI */
+    .glass {
+      width: min(1200px, 92vw);
+      border-radius: 28px;
+      background: linear-gradient(180deg, #ffffff1a, #ffffff08);
+      box-shadow: 0 20px 80px #0009, inset 0 0 0 1px var(--stroke);
+      backdrop-filter: blur(14px) saturate(120%);
+      -webkit-backdrop-filter: blur(14px) saturate(120%);
+      overflow: hidden;
+      padding: 36px;
+    }
+
+    /* TYPOGRAPHY & CONTENT */
+    h1 { font-size: clamp(28px, 4.5vw, 64px); line-height: 1.05; margin: 0; }
+    h2 { font-size: clamp(24px, 3vw, 40px); margin: 0 0 24px; }
+    h3 { font-size: clamp(18px, 2vw, 24px); margin: 24px 0 8px; border-bottom: 1px solid var(--stroke); padding-bottom: 8px; }
+    p { color: var(--muted); font-size: clamp(14px, 1.3vw, 18px); max-width: 80ch; }
+    code { background: #00000030; padding: 4px 8px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; word-wrap: break-word; display: block; }
+
+    .headline { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 16px;}
+    .logo-hero { height: 54px; width: auto; filter: drop-shadow(0 8px 30px #f9731650); }
+
+    /* CARD & OPTIONS GRID */
+    .options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    @media (max-width: 1000px) { .options-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .options-grid { grid-template-columns: 1fr; } }
+
+    .card { border: 1px solid var(--stroke); border-radius: 20px; padding: 18px; background: #ffffff10; transition: transform .25s ease, background .25s ease; cursor: pointer; display: flex; flex-direction: column; }
+    .card:hover { transform: translateY(-4px); background: #ffffff16; }
+    .card h3 { font-size: clamp(18px, 1.6vw, 22px); margin: 6px 0; border: none; padding: 0;}
+    .card p { margin: 0; flex-grow: 1; }
+    .card canvas { width: 100%; height: 80px; display: block; margin-bottom: 12px; border-radius: 12px; }
+
+    /* PROMPTS GRID */
+    .prompts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 768px) { .prompts-grid { grid-template-columns: 1fr; } }
+    .prompt-card { background: #00000020; border: 1px solid #ffffff1a; border-radius: 16px; padding: 20px; }
+    .prompt-card h4 { font-size: 18px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+
+    /* FIXED UI ELEMENTS */
+    .nav { position: fixed; right: 22px; bottom: 22px; z-index: 40; display: flex; gap: 10px; align-items: center; }
+    .btn { border: 1px solid var(--stroke); background: #ffffff18; color: var(--txt); padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 600; }
+    .btn:hover { background: #ffffff22; }
+    .progress { height: 6px; width: 160px; border-radius: 999px; background: #ffffff14; overflow: hidden; }
+    .bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--hot)); transition: width .5s ease; }
+
+    .brand { position: fixed; left: 22px; bottom: 22px; z-index: 40; display: flex; align-items: center; gap: 10px; }
+    .brand img { height: 26px; width: auto; opacity: .95; filter: drop-shadow(0 2px 10px #0006); }
+    .btn-home { border: 1px solid var(--stroke); background: #ffffff18; color: var(--txt); padding: 8px 12px; border-radius: 12px; cursor: pointer; font-weight: 600; margin-left: 8px; }
+    .btn-home:hover { background: #ffffff22; }
+
+    .copy-btn { background: #ffffff18; border: 1px solid var(--stroke); color: var(--txt); padding: 4px 10px; border-radius: 8px; cursor: pointer; transition: background .2s ease; margin-top: 12px; }
+    .copy-btn:hover { background: #ffffff22; }
+    .copy-btn.copied { background: var(--accent); color: #000; }
+  </style>
+</head>
+<body>
+  <!-- Background elements -->
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="grain"></div>
+
+  <!-- Fixed brand/home button -->
+  <div class="brand">
+    <img src="https://experimentlabs.in/assets/Experimentlabs_logo-D8clN1f6.svg" alt="Student Tech Logo"/>
+    <button class="btn-home" id="home">🏠 Home</button>
+  </div>
+
+  <main class="deck" id="deck">
+    <!-- Slide 1: Landing page -->
+    <section class="slide active" data-step="landing">
+      <div class="glass">
+        <div class="headline">
+          <h1>Solving Modern Indian Problems</h1>
+          <img class="logo-hero" src="https://experimentlabs.in/assets/Experimentlabs_logo-D8clN1f6.svg" alt="Student Tech Logo"/>
+        </div>
+        <p>Pick a project to solve a real-world problem. Learn to design it with AI, model it, and plan its creation with no-code tools.</p>
+        <div class="options-grid">
+           <div class="card" data-go="parcelPal">
+            <canvas id="parcelPal-canvas" aria-label="Interactive 3D model of a smart locker"></canvas>
+            <h3>📦 ParcelPal</h3><p>Smart OTP-based Package Locker</p>
+          </div>
+          <div class="card" data-go="hawaLink">
+            <canvas id="hawaLink-canvas" aria-label="Interactive 3D model of a portable AQI monitor"></canvas>
+            <h3>💨 HawaLink</h3><p>Portable Air Quality (AQI) Monitor</p>
+          </div>
+          <div class="card" data-go="payTap">
+            <canvas id="payTap-canvas" aria-label="Interactive 3D model of a UPI NFC terminal"></canvas>
+            <h3>💸 PayTap</h3><p>NFC Terminal for UPI Payments</p>
+          </div>
+          <div class="card" data-go="bijliGuard">
+            <canvas id="bijliGuard-canvas" aria-label="Interactive 3D model of a smart energy meter"></canvas>
+            <h3>⚡ BijliGuard</h3><p>Smart Energy Meter Adapter</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Project Detail Slides -->
+    <section class="slide" data-step="parcelPal">
+      <div class="glass">
+        <h2>📦 ParcelPal: Smart Package Locker</h2>
+        <h3>Why this matters</h3>
+        <p>In busy Indian apartments, coordinating with delivery agents from Flipkart, Amazon etc. is a huge hassle. Missed deliveries are common. A secure, shared locker solves this by allowing agents to drop off packages safely, which residents can collect anytime using an OTP.</p>
+        <h3>How to build it</h3>
+        <div class="prompts-grid">
+            <div class="prompt-card">
+                <h4>🎨 Leo AI Prompt</h4>
+                <code>a smart parcel locker for an Indian apartment building, made of durable grey metal, modular design, with a simple keypad and small screen, clean product photo, modern Indian aesthetic</code>
+                <button class="copy-btn" aria-label="Copy prompt">Copy</button>
+            </div>
+            <div class="prompt-card">
+                <h4>⚙️ Lovable.dev Prompt</h4>
+                <code>Design a resident-facing app with a dark theme and glassmorphic cards. User Journey: 1. Resident logs in. 2. Main screen shows 'Locker Status' and delivery history. 3. Delivery agent texts flat number to the device. 4. Device's GSM module receives SMS, triggers app to generate a 4-digit OTP. 5. App sends OTP back via SMS and stores it. 6. When correct OTP is entered on keypad, trigger servo to unlock.</code>
+                <button class="copy-btn" aria-label="Copy prompt">Copy</button>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-step="hawaLink">
+      <div class="glass">
+        <h2>💨 HawaLink: Portable AQI Monitor</h2>
+        <h3>Why this matters</h3>
+        <p>Air quality in many Indian cities is a major health concern. This portable device allows you to check the AQI (Air Quality Index) anywhere, helping you decide whether it's safe to exercise outdoors, or if you need to use an air purifier at home.</p>
+        <h3>How to build it</h3>
+        <div class="prompts-grid">
+            <div class="prompt-card">
+                <h4>🎨 Leo AI Prompt</h4>
+                <code>a sleek portable air quality monitor, minimalist white plastic, small circular OLED screen showing the AQI number, a simple clip on the back, product photo held in a hand in a modern Indian city street scene</code>
+                <button class="copy-btn" aria-label="Copy prompt">Copy</button>
+            </div>
+            <div class="prompt-card">
+                <h4>⚙️ Lovable.dev Prompt</h4>
+                <code>Design a mobile app with a glassmorphic, color-coded AQI gauge on a dark theme. User Journey: 1. App opens and auto-connects to the device via Bluetooth LE. 2. Main dashboard shows live AQI. 3. A separate screen displays historical data charts. 4. In settings, user can set custom AQI thresholds. 5. If AQI exceeds threshold, send push notification: "High AQI Alert!".</code>
+                <button class="copy-btn" aria-label="Copy prompt">Copy</button>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-step="payTap">
+      <div class="glass">
+        <h2>💸 PayTap: NFC UPI Terminal</h2>
+        <h3>Why this matters</h3>
+        <p>While UPI is huge in India, many small street vendors still rely on customers scanning a QR code from their personal phone. This simple, cheap terminal allows them to accept "tap-to-pay" from any NFC-enabled phone, making transactions faster and more professional without tying up their own mobile.</p>
+        <h3>How to build it</h3>
+        <div class="prompts-grid">
+            <div class="prompt-card">
+                <h4>🎨 Leo AI Prompt</h4>
+                <code>a simple UPI payment terminal for a street food vendor in Mumbai, rugged blue plastic, small screen showing a UPI QR code, prominent NFC tap logo, handheld, product photography</code>
+                <button class="copy-btn" aria-label="Copy prompt">Copy</button>
+            </div>
+            <div class="prompt-card">
+                <h4>⚙️ Lovable.dev Prompt</h4>
+                <code>Design a high-contrast app for outdoor use. User Journey: 1. Vendor enters an amount on a keypad. 2. App generates a UPI payment intent for that amount and displays it as a QR code. 3. Device listens for an NFC tap, which triggers the same payment intent. 4. On successful payment confirmation, show a full-screen green confirmation page with a glassmorphic overlay.</code>
+                <button class="copy-btn" aria-label="Copy prompt">Copy</button>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-step="bijliGuard">
+      <div class="glass">
+        <h2>⚡ BijliGuard: Smart Energy Monitor</h2>
+        <h3>Why this matters</h3>
+        <p>Electricity bills can be a major, unpredictable expense for families. This non-invasive device clamps onto your home's main power line, tracking your energy usage in real-time. The app helps you understand which appliances use the most power and sends alerts if you're about to exceed your monthly budget.</p>
+        <h3>How to build it</h3>
+        <div class="prompts-grid">
+            <div class="prompt-card">
+                <h4>🎨 Leo AI Prompt</h4>
+                <code>a modern smart adapter that clamps onto a home electricity meter in India, non-invasive design, white and orange plastic, small digital display showing wattage, product photo, clean and safe look</code>
+                <button class="copy-btn" aria-label="Copy prompt">Copy</button>
+            </div>
+            <div class="prompt-card">
+                <h4>⚙️ Lovable.dev Prompt</h4>
+                <code>Design an energy monitor app with a dark theme and glassmorphic cards. User Journey: 1. User sees a dashboard with live Watts, today's kWh, and estimated monthly bill. 2. A 'History' tab shows detailed charts. 3. A 'Settings' tab lets the user enter their tariff rate and a monthly budget in Rupees. 4. App calculates estimated bill and sends a push notification if it's projected to exceed the budget.</code>
+                <button class="copy-btn" aria-label="Copy prompt">Copy</button>
+            </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Global fixed navigation -->
+  <div class="nav">
+    <button class="btn" id="prev" aria-label="Previous Slide">◀ Prev</button>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <button class="btn" id="next" aria-label="Next Slide">Next ▶</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let currentIndex = 0;
+        const allSlides = [...document.querySelectorAll('.slide')];
+        const nextButton = document.getElementById('next');
+        const prevButton = document.getElementById('prev');
+        const homeButton = document.getElementById('home');
+        const progressBar = document.getElementById('bar');
+        const navContainer = document.querySelector('.nav');
+
+        function setActiveSlide(index) {
+            allSlides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            currentIndex = index;
+            updateNavUI();
+        }
+
+        function updateNavUI() {
+            if (currentIndex === 0) {
+                navContainer.style.display = 'none';
+                homeButton.style.display = 'none';
+            } else {
+                navContainer.style.display = 'flex';
+                homeButton.style.display = 'flex';
+                const projectSlidesCount = allSlides.length - 1;
+                const progressPercent = projectSlidesCount > 0 ? ((currentIndex - 1) / (projectSlidesCount - 1)) * 100 : 0;
+                progressBar.style.width = `${progressPercent}%`;
+                
+                prevButton.style.visibility = (currentIndex === 1) ? 'hidden' : 'visible';
+                nextButton.style.visibility = (currentIndex === allSlides.length - 1) ? 'hidden' : 'visible';
+            }
+        }
+
+        document.querySelectorAll('.card[data-go]').forEach(card => {
+            card.addEventListener('click', () => {
+                const step = card.dataset.go;
+                const targetIndex = allSlides.findIndex(slide => slide.dataset.step === step);
+                if (targetIndex !== -1) {
+                    setActiveSlide(targetIndex);
+                }
+            });
+        });
+        
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.previousElementSibling;
+                if(code) {
+                    navigator.clipboard.writeText(code.innerText).then(() => {
+                        btn.textContent = 'Copied!';
+                        btn.classList.add('copied');
+                        setTimeout(() => {
+                            btn.textContent = 'Copy';
+                            btn.classList.remove('copied');
+                        }, 1500);
+                    });
+                }
+            });
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < allSlides.length - 1) {
+                setActiveSlide(currentIndex + 1);
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 1) {
+                setActiveSlide(currentIndex - 1);
+            }
+        });
+
+        homeButton.addEventListener('click', () => {
+            setActiveSlide(0);
+        });
+
+        // --- Three.js Initialization ---
+        function initThreeJS() {
+            function setupScene(canvasId, shapeType) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+
+                const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableZoom = false;
+                controls.enablePan = false;
+                controls.autoRotate = true;
+                controls.autoRotateSpeed = 2.0;
+
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+                scene.add(ambientLight);
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                directionalLight.position.set(5, 10, 7.5);
+                scene.add(directionalLight);
+
+                let mesh;
+                if (shapeType === 'parcelPal') {
+                    const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+                    const material = new THREE.MeshStandardMaterial({ color: 0x78716c, roughness: 0.4, metalness: 0.2 });
+                    mesh = new THREE.Mesh(geometry, material);
+                } else if (shapeType === 'hawaLink') {
+                    const geometry = new THREE.BoxGeometry(1, 1.5, 0.4);
+                    const material = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.5 });
+                    mesh = new THREE.Mesh(geometry, material);
+                } else if (shapeType === 'payTap') {
+                    const geometry = new THREE.BoxGeometry(1, 1, 0.3);
+                    const material = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.4 });
+                    mesh = new THREE.Mesh(geometry, material);
+                    mesh.rotation.x = -0.2;
+                    mesh.rotation.y = 0.5;
+                } else if (shapeType === 'bijliGuard') {
+                    const group = new THREE.Group();
+                    const bodyGeo = new THREE.BoxGeometry(1.2, 1, 0.8);
+                    const bodyMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+                    const body = new THREE.Mesh(bodyGeo, bodyMat);
+                    const clampGeo = new THREE.TorusGeometry(0.4, 0.15, 16, 100, Math.PI * 1.5);
+                    const clampMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.5 });
+                    const clamp = new THREE.Mesh(clampGeo, clampMat);
+                    clamp.rotation.y = Math.PI/2;
+                    clamp.position.x = 0.6;
+                    group.add(body, clamp);
+                    mesh = group;
+                }
+
+                scene.add(mesh);
+                camera.position.z = 3;
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    controls.update(); 
+                    renderer.render(scene, camera);
+                }
+                animate();
+                
+                window.addEventListener('resize', () => {
+                    const { clientWidth, clientHeight } = canvas;
+                    if(clientWidth > 0 && clientHeight > 0) {
+                        camera.aspect = clientWidth / clientHeight;
+                        camera.updateProjectionMatrix();
+                        renderer.setSize(clientWidth, clientHeight);
+                    }
+                });
+            }
+
+            setupScene('parcelPal-canvas', 'parcelPal');
+            setupScene('hawaLink-canvas', 'hawaLink');
+            setupScene('payTap-canvas', 'payTap');
+            setupScene('bijliGuard-canvas', 'bijliGuard');
+        }
+        
+        setActiveSlide(0);
+        initThreeJS();
+    });
+
+  </script>
+</body>
+</html>
+
+
